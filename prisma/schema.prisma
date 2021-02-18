@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Inventory {
+  id String @default(uuid()) @id
+  name String
+  slug String @unique
+  points Int
+  enabled Boolean @default(true)
+  products Product[]
+}
+
+model Product {
+  id String @default(uuid()) @id
+  requestingUserId String?
+  status String
+  enabled Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  inventory Inventory @relation(fields: [inventoryId], references: [id])
+  inventoryId String
+}
