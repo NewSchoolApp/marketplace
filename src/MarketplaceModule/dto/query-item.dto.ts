@@ -1,6 +1,15 @@
 import { FilterQueryDTO } from '../../CommonsModule/dto/filter-params.dto';
-import { IsObject, IsOptional, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { ItemTypeEnum } from '../enum/item-type.enum';
+import { Transform, Type } from 'class-transformer';
+import { OrderEnum } from '../../CommonsModule/enum/order.enum';
 
 export type Enumerable<T> = T | Array<T>;
 
@@ -64,26 +73,43 @@ export class NestedBoolFilter {
   not?: NestedBoolFilter | boolean;
 }
 
-class InventoryDTO {
-  slug?: string;
+class ItemDTO {
+  type: ItemTypeEnum;
+  enabled: boolean;
+  quantity: number;
+  name: string;
+  slug: string;
+  status: string;
+  updatedBy: string;
+}
+
+export class QueryItemDTO extends FilterQueryDTO<ItemDTO> {
+  @IsEnum(ItemTypeEnum)
+  @IsOptional()
+  type?: ItemTypeEnum;
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  @IsBoolean()
+  @IsOptional()
+  enabled?: boolean;
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  quantity?: number;
+  @IsString()
+  @IsOptional()
   name?: string;
-  points?: number;
-}
-
-export class QueryInventory extends FilterQueryDTO<InventoryDTO> {
-  slug?: StringFilter;
-  name?: StringFilter;
-  points?: IntFilter;
-}
-
-class Teste2 {
-  testeName2: string;
-}
-
-class Teste {
-  testeName: Teste2;
-}
-
-export class QueryInventoryDTO {
-  query: QueryInventory;
+  @IsString()
+  @IsOptional()
+  slug?: string;
+  @IsString()
+  @IsOptional()
+  status?: string;
+  @IsString()
+  @IsOptional()
+  updatedBy?: string;
 }

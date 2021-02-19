@@ -2,30 +2,47 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Inventory {
-  id String @default(uuid()) @id
-  name String
-  slug String @unique
-  points Int
-  enabled Boolean @default(true)
-  products Product[]
+enum ItemType {
+  PRODUCT
+  SERVICE
 }
 
-model Product {
+enum OrderStatus {
+  IN_ANALISIS
+  WAITING_FOR_WITHDRAWAL
+  SENT
+  DONE
+}
+
+model Item {
   id String @default(uuid()) @id
-  requestingUserId String?
-  status String
+  type ItemType @default(PRODUCT)
   enabled Boolean @default(true)
+  quantity Int @default(0) @db.UnsignedInt()
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  inventory Inventory @relation(fields: [inventoryId], references: [id])
-  inventoryId String
+  name String
+  slug String
+  status String
+  updatedBy String
+}
+
+model Order {
+  id String @default(uuid()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  itemId String
+  userId String
+  testField String
+  status OrderStatus @default(IN_ANALISIS)
+  item Item @relation(fields: [itemId], references: [id])
 }
