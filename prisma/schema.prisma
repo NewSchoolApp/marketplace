@@ -32,6 +32,7 @@ model Item {
   updatedAt DateTime @updatedAt
   name String
   slug String
+  description String? @db.Text()
 }
 
 model Order {
@@ -40,7 +41,7 @@ model Order {
   updatedAt DateTime @updatedAt
   itemId String
   userId String
-  testField String
+  content Json?
   status OrderStatus @default(IN_ANALISIS)
   item Item @relation(fields: [itemId], references: [id])
 }
