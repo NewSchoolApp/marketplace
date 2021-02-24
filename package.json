@@ -29,12 +29,15 @@
     "@nestjs/swagger": "^4.7.13",
     "@prisma/client": "2.17.0",
     "@sentry/node": "^6.0.4",
+    "@ssut/nestjs-sqs": "^1.0.0",
     "class-transformer": "^0.3.2",
     "class-validator": "^0.13.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
-    "swagger-ui-express": "^4.1.6"
+    "slugify": "^1.4.7",
+    "swagger-ui-express": "^4.1.6",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
@@ -46,6 +49,7 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
+    "aws-sdk": "^2.851.0",
     "eslint": "^7.12.1",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "^3.1.4",

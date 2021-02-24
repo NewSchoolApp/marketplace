@@ -3,6 +3,7 @@ import { ItemService } from '../service/item.service';
 import { Item } from '@prisma/client';
 import { QueryItemDTO } from '../dto/query-item.dto';
 import { Constants } from '../../CommonsModule/constants';
+import { CreateItemDTO } from "../dto/create-item.dto";
 
 @Controller(
   `${Constants.API_PREFIX}/${Constants.API_VERSION_1}/${Constants.ITEM_ENDPOINT}`,
@@ -12,7 +13,12 @@ export class ItemController {
 
   @Get()
   public getAll(@Query() query: QueryItemDTO): Promise<Item[]> {
-    return this.service.getAll(query as any);
+    return this.service.getAll(query);
+  }
+
+  @Post()
+  public create(@Body() item: CreateItemDTO): Promise<Item> {
+    return this.service.create(item);
   }
 
   @Get('/slug/:slug')

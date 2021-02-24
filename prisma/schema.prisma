@@ -32,8 +32,6 @@ model Item {
   updatedAt DateTime @updatedAt
   name String
   slug String
-  status String
-  updatedBy String
 }
 
 model Order {

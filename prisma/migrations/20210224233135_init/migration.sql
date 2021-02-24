@@ -8,8 +8,6 @@ CREATE TABLE `Item` (
     `updatedAt` DATETIME(3) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
-    `status` VARCHAR(191) NOT NULL,
-    `updatedBy` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -21,6 +19,7 @@ CREATE TABLE `Order` (
     `updatedAt` DATETIME(3) NOT NULL,
     `itemId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
+    `testField` VARCHAR(191) NOT NULL,
     `status` ENUM('IN_ANALISIS', 'WAITING_FOR_WITHDRAWAL', 'SENT', 'DONE') NOT NULL DEFAULT 'IN_ANALISIS',
 
     PRIMARY KEY (`id`)

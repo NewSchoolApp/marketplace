@@ -1,13 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { SqsService } from '@ssut/nestjs-sqs';
 import { Order } from '@prisma/client';
+import { v4 } from 'uuid';
 import { PrismaService } from '../../PrismaModule/service/prisma.service';
-import { ItemService } from './item.service';
+import { InitOrderDTO } from '../dto/init-order.dto';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly itemService: ItemService,
+    private readonly sqsService: SqsService,
   ) {}
 
   public async createOrder(itemId: string, userId: string) {
@@ -35,6 +37,14 @@ export class OrderService {
       where: {
         userId,
       },
+    });
+  }
+
+  public async initCreateOrder(createOrder: InitOrderDTO) {
+    await this.sqsService.send('createOrder', {
+      id: v4(),
+      body: createOrder,
+      delaySeconds: 0,
     });
   }
 }

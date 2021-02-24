@@ -1,7 +1,9 @@
+import slugify from 'slugify';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Item, PrismaPromise } from '@prisma/client';
 import { PrismaService } from '../../PrismaModule/service/prisma.service';
 import { QueryItemDTO } from '../dto/query-item.dto';
+import { CreateItemDTO } from '../dto/create-item.dto';
 
 @Injectable()
 export class ItemService {
@@ -14,6 +16,12 @@ export class ItemService {
       skip: limit * page,
       take: limit,
       orderBy,
+    });
+  }
+
+  public async create(item: CreateItemDTO) {
+    return this.prisma.item.create({
+      data: { ...item, slug: slugify(item.name) },
     });
   }
 
