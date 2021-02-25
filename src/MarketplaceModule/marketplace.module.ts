@@ -1,8 +1,11 @@
+import * as AWS from 'aws-sdk';
 import { Module } from '@nestjs/common';
 import { SqsModule } from '@ssut/nestjs-sqs';
 import { ItemService } from './service/item.service';
 import { ItemController } from './controller/item.controller';
-import * as AWS from 'aws-sdk';
+import { OrderController } from './controller/order.controller';
+import { OrderService } from './service/order.service';
+import { OrderListener } from './listener/order.listener';
 
 const SQS = new AWS.SQS({ apiVersion: '2012-11-05', region: 'us-east-2' });
 
@@ -29,7 +32,7 @@ const SQS = new AWS.SQS({ apiVersion: '2012-11-05', region: 'us-east-2' });
       ],
     }),
   ],
-  controllers: [ItemController],
-  providers: [ItemService],
+  controllers: [ItemController, OrderController],
+  providers: [ItemService, OrderService, OrderListener],
 })
 export class MarketplaceModule {}
