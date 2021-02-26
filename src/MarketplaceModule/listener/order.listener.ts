@@ -10,9 +10,7 @@ export class OrderListener {
 
   @SqsMessageHandler('createOrder', false)
   public async handleCreateOrderMessage(message: AWS.SQS.Message) {
-    const { itemId, userId }: CreateOrderQueuePayloadDTO = JSON.parse(
-      message.Body,
-    );
-    await this.service.createOrder(itemId, userId);
+    const payload: CreateOrderQueuePayloadDTO = JSON.parse(message.Body);
+    await this.service.createOrder(payload);
   }
 }

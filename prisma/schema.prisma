@@ -21,6 +21,7 @@ enum OrderStatus {
   WAITING_FOR_WITHDRAWAL
   SENT
   DONE
+  CANCELED
 }
 
 model Item {

@@ -24,6 +24,14 @@ export class OrderController {
     return this.service.findById(id);
   }
 
+  @Post('/:id/cancel')
+  public async cancelOrder(
+    @Param('id') id: string,
+    @Body('reason') reason: string,
+  ): Promise<void> {
+    return this.service.cancelOrder({ id, reason });
+  }
+
   @Get('/user/:userId')
   public async getByUserId(@Param(':userId') id: string): Promise<Order[]> {
     return this.service.getByUserId(id);

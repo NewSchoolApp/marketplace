@@ -1,0 +1,7 @@
+export enum OrderStatusEnum {
+  IN_ANALISIS = 'IN_ANALISIS',
+  WAITING_FOR_WITHDRAWL = 'WAITING_FOR_WITHDRAWL',
+  SENT = 'SENT',
+  DONE = 'DONE',
+  CANCELED = 'CANCELED',
+}
