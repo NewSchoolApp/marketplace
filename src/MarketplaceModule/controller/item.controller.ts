@@ -1,10 +1,12 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ItemService } from '../service/item.service';
+import { ApiTags } from '@nestjs/swagger';
 import { Item } from '@prisma/client';
+import { ItemService } from '../service/item.service';
 import { QueryItemDTO } from '../dto/query-item.dto';
 import { Constants } from '../../CommonsModule/constants';
-import { CreateItemDTO } from "../dto/create-item.dto";
+import { CreateItemDTO } from '../dto/create-item.dto';
 
+@ApiTags('Item')
 @Controller(
   `${Constants.API_PREFIX}/${Constants.API_VERSION_1}/${Constants.ITEM_ENDPOINT}`,
 )
