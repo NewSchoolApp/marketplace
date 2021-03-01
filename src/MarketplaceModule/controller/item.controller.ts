@@ -5,6 +5,7 @@ import { ItemService } from '../service/item.service';
 import { QueryItemDTO } from '../dto/query-item.dto';
 import { Constants } from '../../CommonsModule/constants';
 import { CreateItemDTO } from '../dto/create-item.dto';
+import { IncrementDecrementBodyDTO } from '../dto/increment-decrement-body.dto';
 
 @ApiTags('Item')
 @Controller(
@@ -31,7 +32,7 @@ export class ItemController {
   @Post('/:id/quantity/increment')
   public async incrementItemQuantity(
     @Param('id') id: string,
-    @Body('quantity') quantity: number,
+    @Body() { quantity }: IncrementDecrementBodyDTO,
   ): Promise<void> {
     await this.service.incrementItemQuantity(id, quantity);
   }
@@ -39,7 +40,7 @@ export class ItemController {
   @Post('/:id/quantity/decrement')
   public async decrementItemQuantity(
     @Param('id') id: string,
-    @Body('quantity') quantity: number,
+    @Body() { quantity }: IncrementDecrementBodyDTO,
   ): Promise<void> {
     await this.service.decrementItemQuantity(id, quantity);
   }
