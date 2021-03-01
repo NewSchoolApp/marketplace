@@ -13,7 +13,7 @@ export class ItemService {
     const { page, limit, orderBy, ...other } = query;
     return this.prisma.item.findMany({
       where: other,
-      skip: limit * page,
+      skip: limit * (page - 1),
       take: limit,
       orderBy,
     });
