@@ -9,6 +9,9 @@ export class CreateItemDTO {
   @IsNumber()
   @Min(0)
   quantity: number;
+  @IsNumber()
+  @Min(0)
+  points: number;
   @IsEnum(ItemTypeEnum)
   type: ItemTypeEnum;
 }

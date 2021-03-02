@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
-  url = env("DATABASE_URL")
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
@@ -25,24 +25,26 @@ enum OrderStatus {
 }
 
 model Item {
-  id String @default(uuid()) @id
-  type ItemType @default(PRODUCT)
-  enabled Boolean @default(true)
-  quantity Int @default(0) @db.UnsignedInt()
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name String
-  slug String
-  description String? @db.Text()
+  id          String   @id @default(uuid())
+  type        ItemType @default(PRODUCT)
+  enabled     Boolean  @default(true)
+  quantity    Int      @default(0) @db.UnsignedInt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  slug        String
+  points      Int
+  description String?  @db.Text
+  Order       Order[]
 }
 
 model Order {
-  id String @default(uuid()) @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  itemId String
-  userId String
-  content Json?
-  status OrderStatus @default(IN_ANALISIS)
-  item Item @relation(fields: [itemId], references: [id])
+  id        String      @id @default(uuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  itemId    String
+  userId    String
+  content   Json?
+  status    OrderStatus @default(IN_ANALISIS)
+  item      Item        @relation(fields: [itemId], references: [id])
 }
