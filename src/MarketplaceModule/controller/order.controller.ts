@@ -13,19 +13,17 @@ export class OrderController {
   constructor(private readonly service: OrderService) {}
 
   @Post()
-  public async initCreateOrder(
-    @Body() createOrder: InitOrderDTO,
-  ): Promise<void> {
+  public initCreateOrder(@Body() createOrder: InitOrderDTO): Promise<void> {
     return this.service.initCreateOrder(createOrder);
   }
 
   @Get('/:id')
-  public async findById(@Param(':id') id: string): Promise<Order> {
+  public findById(@Param(':id') id: string): Promise<Order> {
     return this.service.findById(id);
   }
 
   @Post('/:id/cancel')
-  public async cancelOrder(
+  public cancelOrder(
     @Param('id') id: string,
     @Body('reason') reason: string,
   ): Promise<void> {
@@ -33,7 +31,7 @@ export class OrderController {
   }
 
   @Get('/user/:userId')
-  public async getByUserId(@Param(':userId') id: string): Promise<Order[]> {
+  public getByUserId(@Param('userId') id: string): Promise<Order[]> {
     return this.service.getByUserId(id);
   }
 }
