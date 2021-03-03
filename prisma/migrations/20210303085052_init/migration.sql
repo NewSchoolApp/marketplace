@@ -8,6 +8,7 @@ CREATE TABLE `Item` (
     `updatedAt` DATETIME(3) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
+    `points` INTEGER NOT NULL,
     `description` TEXT,
 
     PRIMARY KEY (`id`)
