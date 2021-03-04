@@ -17,7 +17,7 @@ export class SecurityIntegration {
     const {
       data: { accessToken },
     } = await this.http
-      .get<GeneratedTokenDTO>(this.config.securityOauthTokenUrl, { headers })
+      .post<GeneratedTokenDTO>(this.config.securityOauthTokenUrl, { headers })
       .toPromise();
     return accessToken;
   }
