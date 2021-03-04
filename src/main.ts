@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import * as Sentry from '@sentry/node';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AppConfigService as ConfigService } from './ConfigModule/service/app-config.service';
 
 async function bootstrap() {
   const appOptions = { cors: true };
@@ -12,6 +14,8 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  const appConfigService = app.get<ConfigService>(ConfigService);
+  Sentry.init(appConfigService.getSentryConfiguration());
   const options = new DocumentBuilder()
     .setTitle('@Marketplace/marketplace')
     .setDescription('Backend do Marketplace da NewSchool')
