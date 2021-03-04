@@ -26,13 +26,13 @@ export class ItemService {
   }
 
   public async findBySlug(slug: string): Promise<Item> {
-    const inventory: Item = await this.prisma.item.findFirst({
+    const item: Item = await this.prisma.item.findFirst({
       where: { slug },
     });
-    if (!inventory) {
-      throw new NotFoundException(`Inventory with slug "${slug}" not found`);
+    if (!item) {
+      throw new NotFoundException(`Item with slug "${slug}" not found`);
     }
-    return inventory;
+    return item;
   }
 
   public async incrementItemQuantity(
