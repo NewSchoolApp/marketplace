@@ -4,6 +4,8 @@ import { Order } from '@prisma/client';
 import { Constants } from '../../CommonsModule/constants';
 import { OrderService } from '../service/order.service';
 import { InitOrderDTO } from '../dto/init-order.dto';
+import { OrderCanceledEnum } from '../enum/order-canceled.enum';
+import { CancelOrderDTO } from '../dto/cancel-order.dto';
 
 @ApiTags('Order')
 @Controller(
@@ -25,7 +27,7 @@ export class OrderController {
   @Post('/:id/cancel')
   public cancelOrder(
     @Param('id') id: string,
-    @Body('reason') reason: string,
+    @Body() { reason }: CancelOrderDTO,
   ): Promise<void> {
     return this.service.cancelOrder({ id, reason });
   }
