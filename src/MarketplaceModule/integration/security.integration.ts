@@ -14,10 +14,15 @@ export class SecurityIntegration {
     const headers = {
       Authorization: `Basic ${clientCredentialsBase64}`,
     };
+    const body = {
+      grant_type: 'client_credentials',
+    };
     const {
       data: { accessToken },
     } = await this.http
-      .post<GeneratedTokenDTO>(this.config.securityOauthTokenUrl, { headers })
+      .post<GeneratedTokenDTO>(this.config.securityOauthTokenUrl, body, {
+        headers,
+      })
       .toPromise();
     return accessToken;
   }

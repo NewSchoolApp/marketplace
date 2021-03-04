@@ -23,7 +23,7 @@ export class AppConfigService {
     'SECURITY_CLIENT_CREDENTIALS_SECRET',
   );
 
-  // url example: http://localhost:8080/api/v1/user/:userId
+  // url example: http://localhost:8080/api/v1/notification/user/:userId
   educationPlatformCreateNotificationUrl: string = this.configService.get<string>(
     'EDUCATION_PLATFORM_CREATE_NOTIFICATION_URL',
   );

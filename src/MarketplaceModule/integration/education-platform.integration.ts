@@ -29,10 +29,12 @@ export class EducationPlatformIntegration {
     const headers = {
       authorization: `Bearer ${accessToken}`,
     };
-    await this.http.post(
-      this.config.getEducationPlatformCreateNotificationUrl(params.userId),
-      body,
-      { headers },
-    );
+    await this.http
+      .post(
+        this.config.getEducationPlatformCreateNotificationUrl(params.userId),
+        body,
+        { headers },
+      )
+      .toPromise();
   }
 }
