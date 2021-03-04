@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import * as Sentry from '@sentry/node';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 import { AppModule } from './app.module';
 import { AppConfigService as ConfigService } from './ConfigModule/service/app-config.service';
 

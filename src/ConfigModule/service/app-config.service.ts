@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 
 @Injectable()
 export class AppConfigService {
@@ -39,6 +40,10 @@ export class AppConfigService {
       enabled: this.nodeEnv !== 'TEST',
       environment: this.nodeEnv,
       attachStacktrace: true,
+      integrations: [
+        new Sentry.Integrations.Http({ tracing: true }),
+        new Tracing.Integrations.Mysql() as any,
+      ],
     };
   }
 

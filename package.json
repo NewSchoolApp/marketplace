@@ -29,6 +29,7 @@
     "@nestjs/swagger": "^4.7.13",
     "@prisma/client": "2.17.0",
     "@sentry/node": "^6.0.4",
+    "@sentry/tracing": "^6.2.1",
     "@ssut/nestjs-sqs": "^1.0.0",
     "class-transformer": "^0.3.2",
     "class-validator": "^0.13.1",
