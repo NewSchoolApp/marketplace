@@ -34,6 +34,8 @@ export class OrderService {
     await this.sqsService.send('createOrder', {
       id: v4(),
       body: createOrder,
+      groupId: v4(),
+      deduplicationId: v4(),
     });
   }
 
