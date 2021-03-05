@@ -1,13 +1,21 @@
 import slugify from 'slugify';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Item, PrismaPromise } from '@prisma/client';
 import { PrismaService } from '../../PrismaModule/service/prisma.service';
 import { QueryItemDTO } from '../dto/query-item.dto';
 import { CreateItemDTO } from '../dto/create-item.dto';
+import { ItemRepository } from '../repository/item.repository';
 
 @Injectable()
 export class ItemService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly repository: ItemRepository,
+    private readonly prisma: PrismaService,
+  ) {}
 
   public getAll(query: QueryItemDTO): Promise<Item[]> {
     const { page, limit, orderBy, ...other } = query;
@@ -33,6 +41,16 @@ export class ItemService {
       throw new NotFoundException(`Item with slug "${slug}" not found`);
     }
     return item;
+  }
+
+  public async findAvailableById(id: string) {
+    const availableItem = await this.repository.findAvailableById(id);
+    if (!availableItem) {
+      throw new BadRequestException(
+        `Item with id ${id} isn't avaliable in stock`,
+      );
+    }
+    return availableItem;
   }
 
   public async incrementItemQuantity(

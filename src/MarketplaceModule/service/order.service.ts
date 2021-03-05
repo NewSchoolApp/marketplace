@@ -1,39 +1,30 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { SqsService } from '@ssut/nestjs-sqs';
 import { Order } from '@prisma/client';
 import { v4 } from 'uuid';
 import { PrismaService } from '../../PrismaModule/service/prisma.service';
 import { InitOrderDTO } from '../dto/init-order.dto';
 import { OrderStatusEnum } from '../enum/order-status.enum';
-import { ItemRepository } from '../repository/item.repository';
 import { EducationPlatformIntegration } from '../integration/education-platform.integration';
 import { OrderCanceledEnum } from '../enum/order-canceled.enum';
+import { ItemService } from './item.service';
+import { ItemRepository } from '../repository/item.repository';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sqsService: SqsService,
-    private readonly repository: ItemRepository,
+    private readonly itemService: ItemService,
     private readonly educationPlatformIntegration: EducationPlatformIntegration,
+    private readonly itemRepository: ItemRepository,
   ) {}
 
   public async initCreateOrder(createOrder: InitOrderDTO) {
-    const avaliableItem = await this.repository.findAvaliableById(
-      createOrder.itemId,
-    );
-    if (!avaliableItem) {
-      throw new BadRequestException(
-        `Item with id ${createOrder.itemId} isn't avaliable in stock`,
-      );
-    }
+    await this.itemService.findAvailableById(createOrder.itemId);
     await this.sqsService.send('createOrder', {
       id: v4(),
-      body: createOrder,
+      body: { createOrder },
       groupId: v4(),
       deduplicationId: v4(),
     });
@@ -46,7 +37,7 @@ export class OrderService {
     itemId: string;
     userId: string;
   }) {
-    const avaliableItem = await this.repository.findAvaliableById(itemId);
+    const avaliableItem = await this.itemRepository.findAvailableById(itemId);
     if (!avaliableItem) {
       await this.educationPlatformIntegration.createNotification({
         itemId,

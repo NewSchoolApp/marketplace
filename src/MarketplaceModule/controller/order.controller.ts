@@ -4,7 +4,6 @@ import { Order } from '@prisma/client';
 import { Constants } from '../../CommonsModule/constants';
 import { OrderService } from '../service/order.service';
 import { InitOrderDTO } from '../dto/init-order.dto';
-import { OrderCanceledEnum } from '../enum/order-canceled.enum';
 import { CancelOrderDTO } from '../dto/cancel-order.dto';
 
 @ApiTags('Order')
