@@ -5,7 +5,7 @@ export enum OrderStatusEnum {
   SENT = 'SENT',
 
   // Status inicial usado caso o item seja um produto e tenha data de retirada
-  WAITING_FOR_WITHDRAWL = 'WAITING_FOR_WITHDRAWL',
+  WAITING_FOR_WITHDRAWAL = 'WAITING_FOR_WITHDRAWAL',
 
   // Status inicial usado caso o item seja um serviço
   NOTIFYING_COMPANY = 'NOTIFYING_COMPANY',

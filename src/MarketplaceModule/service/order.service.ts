@@ -183,17 +183,13 @@ export class OrderService {
     itemType: ItemTypeEnum;
     content: ContentDTO;
   }) {
-    // Se for um produto e tem data de retirada, o status deve indicar que está esperando a retirada
-    if (this.isProduct(itemType) && this.hasWithdrawlDate(content)) {
-      return OrderStatusEnum.WAITING_FOR_WITHDRAWL;
-    }
-    // Se for um produto e não tem data de retirada, o status deve indicar que está em separação
-    if (this.isProduct(itemType) && !this.hasWithdrawlDate(content)) {
-      return OrderStatusEnum.SEPARATING;
-    }
-    // Se for um serviço, o status deve indicar que vamos comunicar a empresa
     if (this.isService(itemType)) {
       return OrderStatusEnum.NOTIFYING_COMPANY;
+    }
+    if (this.isProduct(itemType) && this.hasWithdrawalDate(content)) {
+      return this.hasWithdrawalDate(content)
+        ? OrderStatusEnum.WAITING_FOR_WITHDRAWAL
+        : OrderStatusEnum.SEPARATING;
     }
   }
 
@@ -205,7 +201,7 @@ export class OrderService {
     return itemType === ItemTypeEnum.SERVICE;
   }
 
-  private hasWithdrawlDate(content: ContentDTO): boolean {
-    return content.withdrawlDate != null;
+  private hasWithdrawalDate(content: ContentDTO): boolean {
+    return content.withdrawalDate != null;
   }
 }

@@ -4,7 +4,7 @@ export class ContentDTO {
   // Usado pra quando o usuário vai pegar o produto na NewSchool
   @IsOptional()
   @IsDate()
-  withdrawlDate?: Date;
+  withdrawalDate?: Date;
 }
 
 export class InitOrderDTO {
