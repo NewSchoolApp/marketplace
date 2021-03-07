@@ -30,7 +30,7 @@ export class ItemService {
 
   public async create(item: CreateItemDTO) {
     return this.prisma.item.create({
-      data: { ...item, slug: slugify(item.name) },
+      data: { ...item, slug: slugify(item.name), photo: '' },
     });
   }
 

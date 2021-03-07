@@ -12,6 +12,7 @@ export class CreateItemDTO {
   @IsNumber()
   @Min(0)
   points: number;
+  photo: any;
   @IsEnum(ItemTypeEnum)
   type: ItemTypeEnum;
 }
