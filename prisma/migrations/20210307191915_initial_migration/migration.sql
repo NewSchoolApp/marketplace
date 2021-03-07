@@ -9,6 +9,7 @@ CREATE TABLE `Item` (
     `name` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
     `points` INTEGER NOT NULL,
+    `photo` VARCHAR(191) NOT NULL,
     `description` TEXT,
 
     PRIMARY KEY (`id`)
@@ -21,8 +22,10 @@ CREATE TABLE `Order` (
     `updatedAt` DATETIME(3) NOT NULL,
     `itemId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
+    `points` INTEGER NOT NULL,
+    `quantity` INTEGER NOT NULL,
     `content` JSON,
-    `status` ENUM('IN_ANALISIS', 'WAITING_FOR_WITHDRAWAL', 'SENT', 'DONE', 'CANCELED') NOT NULL DEFAULT 'IN_ANALISIS',
+    `status` ENUM('SEPARATING', 'WAITING_FOR_WITHDRAWL', 'NOTIFYING_COMPANY', 'SENT_TO_COMPANY', 'SENT', 'DONE', 'CANCELED') NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

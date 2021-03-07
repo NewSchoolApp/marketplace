@@ -1,4 +1,4 @@
-import { IsDate, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsOptional, IsString, IsNumber, Min } from 'class-validator';
 
 export class ContentDTO {
   // Usado pra quando o usuário vai pegar o produto na NewSchool
@@ -12,6 +12,9 @@ export class InitOrderDTO {
   itemId: string;
   @IsString()
   userId: string;
+  @IsNumber()
+  @Min(1)
+  quantity: number;
   @IsOptional()
   content?: ContentDTO;
 }

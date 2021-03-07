@@ -1,0 +1,4 @@
+export enum ErrorCodeEnum {
+  NOT_ENOUGH_POINTS = 'NOT_ENOUGH_POINTS',
+  NOT_IN_STOCK = 'NOT_IN_STOCK'
+}

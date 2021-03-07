@@ -17,8 +17,10 @@ enum ItemType {
 }
 
 enum OrderStatus {
-  IN_ANALISIS
-  WAITING_FOR_WITHDRAWAL
+  SEPARATING
+  WAITING_FOR_WITHDRAWL
+  NOTIFYING_COMPANY
+  SENT_TO_COMPANY
   SENT
   DONE
   CANCELED
@@ -34,6 +36,7 @@ model Item {
   name        String
   slug        String
   points      Int
+  photo       String
   description String?  @db.Text
   Order       Order[]
 }
@@ -44,7 +47,9 @@ model Order {
   updatedAt DateTime    @updatedAt
   itemId    String
   userId    String
+  points    Int
+  quantity  Int
   content   Json?
-  status    OrderStatus @default(IN_ANALISIS)
+  status    OrderStatus
   item      Item        @relation(fields: [itemId], references: [id])
 }

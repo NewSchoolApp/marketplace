@@ -9,6 +9,7 @@ import { PrismaService } from '../../PrismaModule/service/prisma.service';
 import { QueryItemDTO } from '../dto/query-item.dto';
 import { CreateItemDTO } from '../dto/create-item.dto';
 import { ItemRepository } from '../repository/item.repository';
+import { ErrorCodeEnum } from '../../CommonsModule/enum/error-code.enum';
 
 @Injectable()
 export class ItemService {
@@ -46,9 +47,10 @@ export class ItemService {
   public async findAvailableById(id: string) {
     const availableItem = await this.repository.findAvailableById(id);
     if (!availableItem) {
-      throw new BadRequestException(
-        `Item with id ${id} isn't avaliable in stock`,
-      );
+      throw new BadRequestException({
+        message: `Item with id ${id} isn't avaliable in stock`,
+        errorCode: ErrorCodeEnum.NOT_IN_STOCK,
+      });
     }
     return availableItem;
   }

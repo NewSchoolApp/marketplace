@@ -5,6 +5,8 @@ import { CreateNotificationDTO } from '../dto/create-notification.dto';
 import { NotificationTypeEnum } from '../enum/notification-type.enum';
 import { OrderStatusEnum } from '../enum/order-status.enum';
 import { OrderCanceledEnum } from '../enum/order-canceled.enum';
+import { RankingDTO } from '../dto/ranking.dto';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class EducationPlatformIntegration {
@@ -14,12 +16,29 @@ export class EducationPlatformIntegration {
     private readonly securityIntegration: SecurityIntegration,
   ) {}
 
+  public async getUserRanking(
+    userId: string,
+  ): Promise<AxiosResponse<RankingDTO>> {
+    const accessToken: string = await this.securityIntegration.getAccessToken();
+    const headers = {
+      authorization: `Bearer ${accessToken}`,
+    };
+    return await this.http
+      .get<RankingDTO>(
+        this.config.getEducationPlatformGetUserRankingUrl(userId),
+        {
+          headers,
+        },
+      )
+      .toPromise();
+  }
+
   public async createNotification(params: {
     itemId: string;
     userId: string;
     status: OrderStatusEnum;
     description?: OrderCanceledEnum;
-  }) {
+  }): Promise<void> {
     const accessToken: string = await this.securityIntegration.getAccessToken();
     const body: CreateNotificationDTO = {
       content: params,
