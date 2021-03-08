@@ -21,7 +21,7 @@ const mailerAsyncModule: MailerAsyncOptions = {
     NestConfigModule.forRoot({
       isGlobal: true,
     }),
-    // MailerModule.forRootAsync(mailerAsyncModule),
+    MailerModule.forRootAsync(mailerAsyncModule),
     RavenModule,
     PrismaModule,
     ConfigModule,

@@ -1,4 +1,5 @@
 export enum OrderCanceledEnum {
   NOT_IN_STOCK = 'NOT_IN_STOCK',
+  DOES_NOT_EXISTS = 'DOES_NOT_EXISTS',
   NOT_ENOUGH_POINTS = 'NOT_ENOUGH_POINTS',
 }

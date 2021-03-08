@@ -10,6 +10,7 @@ CREATE TABLE `Item` (
     `slug` VARCHAR(191) NOT NULL,
     `points` INTEGER NOT NULL,
     `photo` VARCHAR(191) NOT NULL,
+    `supportEmail` VARCHAR(191) NOT NULL,
     `description` TEXT,
 
     PRIMARY KEY (`id`)
@@ -25,7 +26,7 @@ CREATE TABLE `Order` (
     `points` INTEGER NOT NULL,
     `quantity` INTEGER NOT NULL,
     `content` JSON,
-    `status` ENUM('SEPARATING', 'WAITING_FOR_WITHDRAWAL', 'NOTIFYING_COMPANY', 'SENT_TO_COMPANY', 'SENT', 'DONE', 'CANCELED') NOT NULL,
+    `status` ENUM('SEPARATING', 'WAITING_FOR_WITHDRAWAL', 'NOTIFYING_COMPANY', 'COMPANY_NOTIFIED', 'SENT', 'DONE', 'CANCELED') NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

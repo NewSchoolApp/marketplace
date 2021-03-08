@@ -13,4 +13,10 @@ export class OrderListener {
     const payload: CreateOrderQueuePayloadDTO = JSON.parse(message.Body);
     await this.service.createOrder(payload);
   }
+
+  @SqsMessageHandler('sendEmailToCompany', false)
+  public async handleSendEmailToCompanyMessage(message: AWS.SQS.Message) {
+    const payload = JSON.parse(message.Body);
+    await this.service.sendEmailToCompany(payload);
+  }
 }

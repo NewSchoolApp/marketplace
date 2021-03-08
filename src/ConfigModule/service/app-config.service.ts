@@ -36,6 +36,11 @@ export class AppConfigService {
     'EDUCATION_PLATFORM_GET_USER_RANKING_URL',
   );
 
+  // url example: http://localhost:8080/api/v1/user/:userId
+  educationPlatformGetUserUrl: string = this.configService.get<string>(
+    'EDUCATION_PLATFORM_GET_USER_URL',
+  );
+
   nodeEnv: string = this.configService.get<string>('NODE_ENV');
   port: number = this.configService.get<number>('PORT');
 
@@ -85,14 +90,18 @@ export class AppConfigService {
     };
   }
 
-  getEducationPlatformCreateNotificationUrl(userId: string) {
+  getEducationPlatformCreateNotificationUrl(userId: string): string {
     return this.educationPlatformCreateNotificationUrl.replace(
       ':userId',
       userId,
     );
   }
 
-  getEducationPlatformGetUserRankingUrl(userId: string) {
+  getEducationPlatformGetUserRankingUrl(userId: string): string {
+    return this.educationPlatformGetUserRankingUrl.replace(':userId', userId);
+  }
+
+  getEducationPlatformGetUserUrl(userId: string): string {
     return this.educationPlatformGetUserRankingUrl.replace(':userId', userId);
   }
 

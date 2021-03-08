@@ -10,7 +10,7 @@ export enum OrderStatusEnum {
   // Status inicial usado caso o item seja um serviço
   NOTIFYING_COMPANY = 'NOTIFYING_COMPANY',
   // Segundo Status usado caso o item seja um serviço
-  SENT_TO_COMPANY = 'SENT_TO_PROVIDER',
+  COMPANY_NOTIFIED = 'COMPANY_NOTIFIED',
 
   // Status final
   DONE = 'DONE',

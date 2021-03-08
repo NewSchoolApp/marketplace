@@ -1,5 +1,3 @@
-import { ContentDTO } from './../dto/init-order.dto';
-import { ItemTypeEnum } from './../enum/item-type.enum';
 import {
   BadRequestException,
   Injectable,
@@ -7,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SqsService } from '@ssut/nestjs-sqs';
-import { Order } from '@prisma/client';
+import { Order, Item } from '@prisma/client';
 import { v4 } from 'uuid';
 import { PrismaService } from '../../PrismaModule/service/prisma.service';
 import { InitOrderDTO } from '../dto/init-order.dto';
@@ -17,6 +15,9 @@ import { OrderCanceledEnum } from '../enum/order-canceled.enum';
 import { ItemService } from './item.service';
 import { ItemRepository } from '../repository/item.repository';
 import { OrderRepository } from '../repository/order.repository';
+import { ContentDTO } from '../dto/init-order.dto';
+import { ItemTypeEnum } from '../enum/item-type.enum';
+import { AppConfigService as ConfigService } from '../../ConfigModule/service/app-config.service';
 import { ErrorCodeEnum } from '../../CommonsModule/enum/error-code.enum';
 
 @Injectable()
@@ -28,7 +29,8 @@ export class OrderService {
     private readonly educationPlatformIntegration: EducationPlatformIntegration,
     private readonly itemRepository: ItemRepository,
     private readonly repository: OrderRepository,
-    // private readonly mailerService: MailerService,
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   public async initCreateOrder(createOrder: InitOrderDTO) {
@@ -64,13 +66,37 @@ export class OrderService {
     quantity,
     content,
   }: InitOrderDTO) {
+    const item = await this.itemRepository.findById(itemId);
+    if (!item) {
+      await this.educationPlatformIntegration.createNotification({
+        itemId,
+        userId,
+        quantity,
+        points: null,
+        status: OrderStatusEnum.CANCELED,
+        content: {
+          cancelation: {
+            date: Date.now(),
+            reason: OrderCanceledEnum.DOES_NOT_EXISTS,
+          },
+        },
+      });
+      return;
+    }
     const availableItem = await this.itemRepository.findAvailableById(itemId);
     if (!availableItem) {
       await this.educationPlatformIntegration.createNotification({
         itemId,
         userId,
+        quantity,
+        points: item.points,
         status: OrderStatusEnum.CANCELED,
-        description: OrderCanceledEnum.NOT_IN_STOCK,
+        content: {
+          cancelation: {
+            date: Date.now(),
+            reason: OrderCanceledEnum.NOT_IN_STOCK,
+          },
+        },
       });
       return;
     }
@@ -89,8 +115,15 @@ export class OrderService {
       await this.educationPlatformIntegration.createNotification({
         itemId,
         userId,
+        points: Number(points),
+        quantity,
+        content: {
+          cancelation: {
+            date: Date.now(),
+            reason: OrderCanceledEnum.NOT_ENOUGH_POINTS,
+          },
+        },
         status: OrderStatusEnum.CANCELED,
-        description: OrderCanceledEnum.NOT_ENOUGH_POINTS,
       });
       return;
     }
@@ -112,13 +145,12 @@ export class OrderService {
           quantity,
           content: content as Record<string, string>,
         },
+        include: {
+          item: true,
+        },
       }),
     ]);
-    await this.educationPlatformIntegration.createNotification({
-      itemId,
-      userId,
-      status,
-    });
+    await this.educationPlatformIntegration.createNotification(order);
     if (availableItem.type === ItemTypeEnum.SERVICE) {
       await this.sqsService.send('sendEmailToCompany', {
         id: v4(),
@@ -161,28 +193,44 @@ export class OrderService {
           content: { cancelation: { date: Date.now(), reason } },
           status: OrderStatusEnum.CANCELED,
         },
+        include: {
+          item: true,
+        },
       }),
       this.prisma.item.update({
         where: { id: order.itemId },
         data: { quantity: { increment: 1 } },
       }),
     ]);
-    await this.educationPlatformIntegration.createNotification({
-      itemId: order.itemId,
-      userId: order.userId,
-      status: OrderStatusEnum.CANCELED,
-      description: reason,
-    });
+    await this.educationPlatformIntegration.createNotification(order);
   }
 
-  public sendEmailToCompany(payload: any) {
-    // this.mailerService.sendMail({
-    //   to: 'test@nestjs.com', // list of receivers
-    //   from: 'noreply@nestjs.com', // sender address
-    //   subject: 'Testing Nest MailerModule ✔', // Subject line
-    //   text: 'welcome', // plaintext body
-    //   html: '<b>welcome</b>', // HTML body content
-    // });
+  public async sendEmailToCompany(
+    order: Order & {
+      item: Item;
+    },
+  ) {
+    const { data: user } = await this.educationPlatformIntegration.getUser({
+      userId: order.userId,
+    });
+    const phoneText = user.phone ? `e telefone ${user.phone}` : '';
+    await this.mailerService.sendMail({
+      to: order.item.supportEmail,
+      from: this.configService.smtpFrom,
+      cc: this.configService.smtpFrom,
+      subject: 'Usuário deseja seu serviço!',
+      text: `O usuário ${user.name} com email ${user.email} ${phoneText} deseja seu serviço de ${order.item.name}. Por favor, entre em contato com ele`,
+    });
+    const { item, ...rest } = order;
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: order.id },
+      data: {
+        ...rest,
+        status: OrderStatusEnum.COMPANY_NOTIFIED,
+      },
+      include: { item: true },
+    });
+    await this.educationPlatformIntegration.createNotification(updatedOrder);
   }
 
   private async getUserUsedPoints(userId: string): Promise<number> {

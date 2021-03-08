@@ -3,6 +3,8 @@ import { ItemTypeEnum } from '../enum/item-type.enum';
 
 export class CreateItemDTO {
   @IsString()
+  supportEmail: string;
+  @IsString()
   name: string;
   @IsString()
   description: string;
