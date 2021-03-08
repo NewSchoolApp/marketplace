@@ -28,7 +28,7 @@ export class OrderService {
     private readonly educationPlatformIntegration: EducationPlatformIntegration,
     private readonly itemRepository: ItemRepository,
     private readonly repository: OrderRepository,
-    private readonly mailerService: MailerService,
+    // private readonly mailerService: MailerService,
   ) {}
 
   public async initCreateOrder(createOrder: InitOrderDTO) {
@@ -176,13 +176,13 @@ export class OrderService {
   }
 
   public sendEmailToCompany(payload: any) {
-    this.mailerService.sendMail({
-      to: 'test@nestjs.com', // list of receivers
-      from: 'noreply@nestjs.com', // sender address
-      subject: 'Testing Nest MailerModule ✔', // Subject line
-      text: 'welcome', // plaintext body
-      html: '<b>welcome</b>', // HTML body content
-    });
+    // this.mailerService.sendMail({
+    //   to: 'test@nestjs.com', // list of receivers
+    //   from: 'noreply@nestjs.com', // sender address
+    //   subject: 'Testing Nest MailerModule ✔', // Subject line
+    //   text: 'welcome', // plaintext body
+    //   html: '<b>welcome</b>', // HTML body content
+    // });
   }
 
   private async getUserUsedPoints(userId: string): Promise<number> {
