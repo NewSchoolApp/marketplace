@@ -7,6 +7,7 @@ import { OrderController } from './controller/order.controller';
 import { OrderService } from './service/order.service';
 import { OrderListener } from './listener/order.listener';
 import { ItemRepository } from './repository/item.repository';
+import { OrderRepository } from './repository/order.repository';
 import { SecurityIntegration } from './integration/security.integration';
 import { EducationPlatformIntegration } from './integration/education-platform.integration';
 
@@ -19,7 +20,7 @@ const SQS = new AWS.SQS({ apiVersion: '2012-11-05', region: 'us-east-2' });
         {
           name: 'createOrder',
           queueUrl: process.env.CREATE_ORDER_QUEUE_URL,
-          sqs: SQS, // instance of new AWS.SQS
+          sqs: SQS,
           waitTimeSeconds: 1,
           batchSize: 1,
           terminateVisibilityTimeout: true,
@@ -32,6 +33,11 @@ const SQS = new AWS.SQS({ apiVersion: '2012-11-05', region: 'us-east-2' });
           queueUrl: process.env.CREATE_ORDER_QUEUE_URL,
           sqs: SQS,
         },
+        {
+          name: 'sendEmailToCompany',
+          queueUrl: process.env.SEND_EMAIL_TO_COMPANY_QUEUE_URL,
+          sqs: SQS,
+        },
       ],
     }),
     HttpModule,
@@ -42,6 +48,7 @@ const SQS = new AWS.SQS({ apiVersion: '2012-11-05', region: 'us-east-2' });
     OrderService,
     OrderListener,
     ItemRepository,
+    OrderRepository,
     SecurityIntegration,
     EducationPlatformIntegration,
   ],

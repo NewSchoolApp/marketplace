@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
 import { SqsService } from '@ssut/nestjs-sqs';
 import { Order } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -27,6 +28,7 @@ export class OrderService {
     private readonly educationPlatformIntegration: EducationPlatformIntegration,
     private readonly itemRepository: ItemRepository,
     private readonly repository: OrderRepository,
+    private readonly mailerService: MailerService,
   ) {}
 
   public async initCreateOrder(createOrder: InitOrderDTO) {
@@ -62,8 +64,8 @@ export class OrderService {
     quantity,
     content,
   }: InitOrderDTO) {
-    const avaliableItem = await this.itemRepository.findAvailableById(itemId);
-    if (!avaliableItem) {
+    const availableItem = await this.itemRepository.findAvailableById(itemId);
+    if (!availableItem) {
       await this.educationPlatformIntegration.createNotification({
         itemId,
         userId,
@@ -82,7 +84,7 @@ export class OrderService {
       this.getUserUsedPoints(userId),
     ]);
     const avaliablePoints = Number(points) - userUsedPoints;
-    const neededPointsForPurchase = quantity * avaliableItem.points;
+    const neededPointsForPurchase = quantity * availableItem.points;
     if (avaliablePoints < neededPointsForPurchase) {
       await this.educationPlatformIntegration.createNotification({
         itemId,
@@ -93,10 +95,10 @@ export class OrderService {
       return;
     }
     const status = this.getInitialOrderStatus({
-      itemType: ItemTypeEnum[avaliableItem.type],
+      itemType: ItemTypeEnum[availableItem.type],
       content,
     });
-    await this.prisma.$transaction([
+    const [_, order] = await this.prisma.$transaction([
       this.prisma.item.update({
         where: { id: itemId },
         data: { quantity: { decrement: 1 } },
@@ -106,7 +108,7 @@ export class OrderService {
           itemId,
           userId,
           status,
-          points: avaliableItem.points,
+          points: availableItem.points,
           quantity,
           content: content as Record<string, string>,
         },
@@ -117,16 +119,21 @@ export class OrderService {
       userId,
       status,
     });
-    // Caso o item seja um serviço
-    // devemos jogar uma mensagem em uma fila
-    // para mandar um email para a empresa
-    // avisando que um aluno se interessou pelos serviço
+    if (availableItem.type === ItemTypeEnum.SERVICE) {
+      await this.sqsService.send('sendEmailToCompany', {
+        id: v4(),
+        body: order,
+      });
+    }
   }
 
   public async findById(id: string): Promise<Order> {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {
-      throw new NotFoundException(`Order with id ${id} not found`);
+      throw new NotFoundException({
+        message: `Order with id ${id} not found`,
+        errorCode: ErrorCodeEnum.NOT_IN_STOCK,
+      });
     }
     return order;
   }
@@ -165,6 +172,16 @@ export class OrderService {
       userId: order.userId,
       status: OrderStatusEnum.CANCELED,
       description: reason,
+    });
+  }
+
+  public sendEmailToCompany(payload: any) {
+    this.mailerService.sendMail({
+      to: 'test@nestjs.com', // list of receivers
+      from: 'noreply@nestjs.com', // sender address
+      subject: 'Testing Nest MailerModule ✔', // Subject line
+      text: 'welcome', // plaintext body
+      html: '<b>welcome</b>', // HTML body content
     });
   }
 

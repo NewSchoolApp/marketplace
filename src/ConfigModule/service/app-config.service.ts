@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { MailerOptions } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import path from 'path';
 
 @Injectable()
 export class AppConfigService {
@@ -38,6 +41,14 @@ export class AppConfigService {
 
   sentryUrl: string = this.configService.get<string>('SENTRY_URL');
 
+  smtpHost: string = this.configService.get<string>('SMTP_HOST');
+  smtpPort: number = this.configService.get<number>('SMTP_PORT');
+  smtpSecure?: boolean = this.configService.get<boolean>('SMTP_SECURE');
+  smtpRequireTls: boolean = this.configService.get<boolean>('SMTP_REQUIRE_TLS');
+  smtpUser: string = this.configService.get<string>('SMTP_USER');
+  smtpPassword: string = this.configService.get<string>('SMTP_PASSWORD');
+  smtpFrom: string = this.configService.get<string>('SMTP_FROM');
+
   public getSentryConfiguration(): Sentry.NodeOptions {
     return {
       dsn: this.sentryUrl,
@@ -49,6 +60,28 @@ export class AppConfigService {
         new Sentry.Integrations.Http({ tracing: true }),
         new Tracing.Integrations.Mysql() as any,
       ],
+    };
+  }
+
+  public getSmtpConfiguration(): MailerOptions {
+    return {
+      transport: {
+        host: this.smtpHost,
+        port: this.smtpPort,
+        secure: this.smtpSecure,
+        requireTLS: this.smtpRequireTls,
+        auth: {
+          user: this.smtpUser,
+          pass: this.smtpPassword,
+        },
+      },
+      template: {
+        dir: path.resolve(path.join(__dirname, '..', '..')) + '/../templates',
+        adapter: new HandlebarsAdapter(), // or new PugAdapter()
+        options: {
+          strict: true,
+        },
+      },
     };
   }
 
