@@ -9,7 +9,9 @@ export class ItemRepository {
     return this.prisma.item.findUnique({ where: { id } });
   }
 
-  public findAvailableById(id: string) {
-    return this.prisma.item.findFirst({ where: { id, quantity: { gt: 0 } } });
+  public findAvailableById({ id, minQuantity }: { id; minQuantity }) {
+    return this.prisma.item.findFirst({
+      where: { id, quantity: { gte: minQuantity } },
+    });
   }
 }

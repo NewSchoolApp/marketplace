@@ -44,11 +44,22 @@ export class ItemService {
     return item;
   }
 
-  public async findAvailableById(id: string) {
-    const availableItem = await this.repository.findAvailableById(id);
+  public async findAvailableById(
+    {
+      id,
+      minQuantity,
+    }: {
+      id: string;
+      minQuantity: number;
+    } = { id: null, minQuantity: 0 },
+  ) {
+    const availableItem = await this.repository.findAvailableById({
+      id,
+      minQuantity: minQuantity,
+    });
     if (!availableItem) {
       throw new BadRequestException({
-        message: `Item with id ${id} isn't avaliable in stock`,
+        message: `Item with id ${id} doesn't have the ordered quantity`,
         errorCode: ErrorCodeEnum.NOT_IN_STOCK,
       });
     }

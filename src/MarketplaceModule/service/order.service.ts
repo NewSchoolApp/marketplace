@@ -34,7 +34,11 @@ export class OrderService {
   ) {}
 
   public async initCreateOrder(createOrder: InitOrderDTO) {
-    const item = await this.itemService.findAvailableById(createOrder.itemId);
+    await this.findById(createOrder.itemId);
+    const item = await this.itemService.findAvailableById({
+      id: createOrder.itemId,
+      minQuantity: createOrder.quantity,
+    });
     const [
       {
         data: { points },
@@ -83,7 +87,10 @@ export class OrderService {
       });
       return;
     }
-    const availableItem = await this.itemRepository.findAvailableById(itemId);
+    const availableItem = await this.itemRepository.findAvailableById({
+      id: itemId,
+      minQuantity: quantity,
+    });
     if (!availableItem) {
       await this.educationPlatformIntegration.createNotification({
         itemId,
