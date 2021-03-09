@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerOptions } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
-import path from 'path';
 
 @Injectable()
 export class AppConfigService {
@@ -78,13 +76,6 @@ export class AppConfigService {
         auth: {
           user: this.smtpUser,
           pass: this.smtpPassword,
-        },
-      },
-      template: {
-        dir: path.resolve(path.join(__dirname, '..', '..')) + '/../templates',
-        adapter: new HandlebarsAdapter(), // or new PugAdapter()
-        options: {
-          strict: true,
         },
       },
     };
