@@ -66,6 +66,17 @@ export class ItemService {
     return availableItem;
   }
 
+  public async findById(id: string) {
+    const item = await this.repository.findById(id);
+    if (!item) {
+      throw new BadRequestException({
+        message: `Item with id ${id} doesn't have the ordered quantity`,
+        errorCode: ErrorCodeEnum.NOT_IN_STOCK,
+      });
+    }
+    return item;
+  }
+
   public async incrementItemQuantity(
     id: string,
     quantity: number,

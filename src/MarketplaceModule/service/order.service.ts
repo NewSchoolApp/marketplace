@@ -34,7 +34,7 @@ export class OrderService {
   ) {}
 
   public async initCreateOrder(createOrder: InitOrderDTO) {
-    await this.findById(createOrder.itemId);
+    await this.itemService.findById(createOrder.itemId);
     const item = await this.itemService.findAvailableById({
       id: createOrder.itemId,
       minQuantity: createOrder.quantity,
