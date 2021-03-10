@@ -7,6 +7,7 @@ import { CreateNotificationDTO } from '../dto/create-notification.dto';
 import { NotificationTypeEnum } from '../enum/notification-type.enum';
 import { RankingDTO } from '../dto/ranking.dto';
 import { UserDTO } from '../dto/user.dto';
+import { TimeRangeEnum } from '../enum/time-range.enum';
 
 @Injectable()
 export class EducationPlatformIntegration {
@@ -28,6 +29,9 @@ export class EducationPlatformIntegration {
         this.config.getEducationPlatformGetUserRankingUrl(userId),
         {
           headers,
+          params: {
+            timeRange: TimeRangeEnum.YEAR,
+          },
         },
       )
       .toPromise();
