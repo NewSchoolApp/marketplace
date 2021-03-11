@@ -58,7 +58,7 @@ export class EducationPlatformIntegration {
   ): Promise<void> {
     const accessToken: string = await this.securityIntegration.getAccessToken();
     const body: CreateNotificationDTO = {
-      content: params,
+      content: { ...params, ...(params.content as any) },
       important: false,
       type: NotificationTypeEnum.MARKETPLACE,
     };
