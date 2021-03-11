@@ -92,24 +92,17 @@ export class QueryItemDTO extends FilterQueryDTO<ItemDTO> {
     if (value === 'false') return false;
     return value;
   })
-  @IsBoolean()
   @IsOptional()
-  enabled?: boolean;
+  enabled?: boolean | BoolFilter;
   @Type(() => Number)
-  @IsNumber()
-  @Min(0)
   @IsOptional()
-  quantity?: number;
-  @IsString()
+  quantity?: number | IntFilter;
   @IsOptional()
-  name?: string;
-  @IsString()
+  name?: string | StringFilter;
   @IsOptional()
-  slug?: string;
-  @IsString()
+  slug?: string | StringFilter;
   @IsOptional()
-  status?: string;
-  @IsString()
+  status?: string | StringFilter;
   @IsOptional()
-  updatedBy?: string;
+  updatedBy?: string | StringFilter;
 }

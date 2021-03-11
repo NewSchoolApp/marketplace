@@ -30,13 +30,17 @@ export class ItemService {
 
   public async create(item: CreateItemDTO) {
     return this.prisma.item.create({
-      data: { ...item, slug: slugify(item.name), photo: '' },
+      data: {
+        ...item,
+        slug: slugify(item.name, { lower: true, strict: true }),
+        photo: '',
+      },
     });
   }
 
   public async findBySlug(slug: string): Promise<Item> {
     const item: Item = await this.prisma.item.findFirst({
-      where: { slug },
+      where: { slug: { contains: slug } },
     });
     if (!item) {
       throw new NotFoundException(`Item with slug "${slug}" not found`);
