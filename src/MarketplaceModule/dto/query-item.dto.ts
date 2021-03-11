@@ -1,15 +1,7 @@
 import { FilterQueryDTO } from '../../CommonsModule/dto/filter-params.dto';
-import {
-  IsBoolean,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { ItemTypeEnum } from '../enum/item-type.enum';
-import { Transform, Type } from 'class-transformer';
-import { OrderEnum } from '../../CommonsModule/enum/order.enum';
+import { Transform } from 'class-transformer';
 
 export type Enumerable<T> = T | Array<T>;
 
@@ -83,6 +75,19 @@ class ItemDTO {
   updatedBy: string;
 }
 
+function transformIntObject(value: Record<string, any>) {
+  const returnObject: Record<string, any> = {};
+  if (value.equals) returnObject.equals = Number(value?.equals);
+  if (value.in) returnObject.in = value.in.map((inValue) => Number(inValue));
+  if (value.notIn)
+    returnObject.notIn = value.notIn.map((inValue) => Number(inValue));
+  if (value.lt) returnObject.lt = Number(value.lt);
+  if (value.lte) returnObject.lte = Number(value.lte);
+  if (value.gt) returnObject.gt = Number(value.gt);
+  if (value.gte) returnObject.gte = Number(value.gte);
+  return returnObject;
+}
+
 export class QueryItemDTO extends FilterQueryDTO<ItemDTO> {
   @IsEnum(ItemTypeEnum)
   @IsOptional()
@@ -94,8 +99,13 @@ export class QueryItemDTO extends FilterQueryDTO<ItemDTO> {
   })
   @IsOptional()
   enabled?: boolean | BoolFilter;
-  @Type(() => Number)
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'object') {
+      return transformIntObject(value);
+    }
+    return Number(value);
+  })
   quantity?: number | IntFilter;
   @IsOptional()
   name?: string | StringFilter;
