@@ -1,11 +1,12 @@
 import * as AWS from 'aws-sdk';
 import { HttpModule, Module } from '@nestjs/common';
 import { SqsModule } from '@ssut/nestjs-sqs';
-import { ItemService } from './service/item.service';
 import { ItemController } from './controller/item.controller';
 import { OrderController } from './controller/order.controller';
-import { OrderService } from './service/order.service';
 import { OrderListener } from './listener/order.listener';
+import { ItemService } from './service/item.service';
+import { OrderService } from './service/order.service';
+import { UploadService } from './service/upload.service';
 import { ItemRepository } from './repository/item.repository';
 import { OrderRepository } from './repository/order.repository';
 import { SecurityIntegration } from './integration/security.integration';
@@ -50,6 +51,7 @@ const SQS = new AWS.SQS({ apiVersion: '2012-11-05', region: 'us-east-2' });
     ItemRepository,
     OrderRepository,
     SecurityIntegration,
+    UploadService,
     EducationPlatformIntegration,
   ],
 })

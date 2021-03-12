@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { MailerOptions } from '@nestjs-modules/mailer';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import { S3 } from 'aws-sdk';
 
 @Injectable()
 export class AppConfigService {
@@ -52,6 +53,15 @@ export class AppConfigService {
   smtpPassword: string = this.configService.get<string>('SMTP_PASSWORD');
   smtpFrom: string = this.configService.get<string>('SMTP_FROM');
 
+  awsAccessKey: string = this.configService.get<string>('AWS_ACCESS_KEY');
+  awsAccessKeySecret: string = this.configService.get<string>(
+    'AWS_ACCESS_KEY_SECRET',
+  );
+  awsBucketEndpoint: string = this.configService.get<string>(
+    'AWS_BUCKET_ENDPOINT',
+  );
+  awsUserBucket: string = this.configService.get<string>('AWS_USER_BUCKET');
+
   public getSentryConfiguration(): Sentry.NodeOptions {
     return {
       dsn: this.sentryUrl,
@@ -78,6 +88,15 @@ export class AppConfigService {
           pass: this.smtpPassword,
         },
       },
+    };
+  }
+
+  getAwsConfiguration(): S3.Types.ClientConfiguration {
+    return {
+      accessKeyId: this.awsAccessKey,
+      secretAccessKey: this.awsAccessKeySecret,
+      region: 'us-east-2',
+      signatureVersion: 'v4',
     };
   }
 

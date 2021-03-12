@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailerAsyncOptions } from '@nestjs-modules/mailer/dist/interfaces/mailer-async-options.interface';
+import { RavenInterceptor, RavenModule } from 'nest-raven';
 import { PrismaModule } from './PrismaModule/prisma.module';
 import { ConfigModule } from './ConfigModule/config.module';
 import { AppConfigService as ConfigService } from './ConfigModule/service/app-config.service';
 import { MarketplaceModule } from './MarketplaceModule/marketplace.module';
-import { RavenInterceptor, RavenModule } from 'nest-raven';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 
 const mailerAsyncModule: MailerAsyncOptions = {
   useFactory: (appConfigService: ConfigService) =>
@@ -22,6 +23,10 @@ const mailerAsyncModule: MailerAsyncOptions = {
       isGlobal: true,
     }),
     MailerModule.forRootAsync(mailerAsyncModule),
+    MulterModule.register({
+      dest: './upload',
+      limits: { fieldSize: 15 * 1024 * 1024 },
+    }),
     RavenModule,
     PrismaModule,
     ConfigModule,

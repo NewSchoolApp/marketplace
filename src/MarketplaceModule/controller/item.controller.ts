@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { Item } from '@prisma/client';
 import { ItemService } from '../service/item.service';
@@ -20,8 +30,12 @@ export class ItemController {
   }
 
   @Post()
-  public create(@Body() item: CreateItemDTO): Promise<Item> {
-    return this.service.create(item);
+  @UseInterceptors(FileInterceptor('file'))
+  public create(
+    @Body() item: CreateItemDTO,
+    @UploadedFile('file') file: Express.Multer.File,
+  ): Promise<Item> {
+    return this.service.create({ ...item, file });
   }
 
   @Get('/slug/:slug')

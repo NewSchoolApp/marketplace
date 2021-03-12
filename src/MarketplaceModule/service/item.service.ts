@@ -1,14 +1,17 @@
-import slugify from 'slugify';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Item, PrismaPromise } from '@prisma/client';
-import { PrismaService } from '../../PrismaModule/service/prisma.service';
+import { v4 } from 'uuid';
+import slugify from 'slugify';
+import * as path from 'path';
+import { UploadService } from './upload.service';
 import { QueryItemDTO } from '../dto/query-item.dto';
 import { CreateItemDTO } from '../dto/create-item.dto';
 import { ItemRepository } from '../repository/item.repository';
+import { PrismaService } from '../../PrismaModule/service/prisma.service';
 import { ErrorCodeEnum } from '../../CommonsModule/enum/error-code.enum';
 
 @Injectable()
@@ -16,6 +19,7 @@ export class ItemService {
   constructor(
     private readonly repository: ItemRepository,
     private readonly prisma: PrismaService,
+    private readonly uploadService: UploadService,
   ) {}
 
   public getAll(query: QueryItemDTO): Promise<Item[]> {
@@ -28,12 +32,32 @@ export class ItemService {
     });
   }
 
-  public async create(item: CreateItemDTO) {
+  public async create({
+    file,
+    ...item
+  }: CreateItemDTO & { file: Express.Multer.File }) {
+    const acceptedFileExtensions = ['.png', '.jpg', '.jpeg'];
+    const fileExtension = path.extname(file.originalname);
+
+    if (!acceptedFileExtensions.includes(fileExtension)) {
+      throw new BadRequestException({
+        message: `Accepted file types are ${acceptedFileExtensions.join(
+          ',',
+        )}, you upload a ${fileExtension} file`,
+        errorCode: ErrorCodeEnum.WRONG_FILE_EXTENSION,
+      });
+    }
+
+    const id = v4();
+    const photoPath = `${id}/photo.jpg`;
+
+    await this.uploadService.uploadItemPhoto(photoPath, file.buffer);
     return this.prisma.item.create({
       data: {
         ...item,
+        id,
         slug: slugify(item.name, { lower: true, strict: true }),
-        photo: '',
+        photo: photoPath,
       },
     });
   }
