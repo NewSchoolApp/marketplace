@@ -64,7 +64,7 @@ export class ItemService {
     }
 
     const id = v4();
-    const photoPath = `${id}/photo.jpg`;
+    const photoPath = `${id}/photo${fileExtension}`;
 
     await this.uploadService.uploadItemPhoto(photoPath, file.buffer);
     return this.prisma.item.create({
