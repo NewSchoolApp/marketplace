@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,8 +7,8 @@ import {
   Post,
   Query,
   UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+  UseInterceptors
+} from "@nestjs/common";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { Item } from '@prisma/client';
@@ -34,8 +35,9 @@ export class ItemController {
   @UseInterceptors(FileInterceptor('file'))
   public create(
     @Body() item: CreateItemDTO,
-    @UploadedFile('file') file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<Item> {
+    if (!file) throw new BadRequestException('file not found')
     return this.service.create({ ...item, file });
   }
 
