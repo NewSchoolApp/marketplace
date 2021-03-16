@@ -258,7 +258,7 @@ export class OrderService {
     if (this.isService(itemType)) {
       return OrderStatusEnum.NOTIFYING_COMPANY;
     }
-    if (this.isProduct(itemType) && this.hasWithdrawalDate(content)) {
+    if (this.isProduct(itemType)) {
       return this.hasWithdrawalDate(content)
         ? OrderStatusEnum.WAITING_FOR_WITHDRAWAL
         : OrderStatusEnum.SEPARATING;
