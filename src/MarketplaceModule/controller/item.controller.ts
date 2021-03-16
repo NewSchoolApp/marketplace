@@ -16,6 +16,7 @@ import { QueryItemDTO } from '../dto/query-item.dto';
 import { Constants } from '../../CommonsModule/constants';
 import { CreateItemDTO } from '../dto/create-item.dto';
 import { IncrementDecrementBodyDTO } from '../dto/increment-decrement-body.dto';
+import { PageableDTO } from "../../CommonsModule/dto/pageable.dto";
 
 @ApiTags('Item')
 @Controller(
@@ -25,7 +26,7 @@ export class ItemController {
   constructor(private readonly service: ItemService) {}
 
   @Get()
-  public getAll(@Query() query: QueryItemDTO): Promise<Item[]> {
+  public getAll(@Query() query: QueryItemDTO): Promise<PageableDTO<Item>> {
     return this.service.getAll(query);
   }
 

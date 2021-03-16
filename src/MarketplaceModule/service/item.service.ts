@@ -13,6 +13,7 @@ import { CreateItemDTO } from '../dto/create-item.dto';
 import { ItemRepository } from '../repository/item.repository';
 import { PrismaService } from '../../PrismaModule/service/prisma.service';
 import { ErrorCodeEnum } from '../../CommonsModule/enum/error-code.enum';
+import { PageableDTO } from '../../CommonsModule/dto/pageable.dto';
 
 @Injectable()
 export class ItemService {
@@ -22,13 +23,27 @@ export class ItemService {
     private readonly uploadService: UploadService,
   ) {}
 
-  public getAll(query: QueryItemDTO): Promise<Item[]> {
+  public async getAll(query: QueryItemDTO): Promise<PageableDTO<Item>> {
     const { page, limit, orderBy, ...other } = query;
-    return this.prisma.item.findMany({
+    const items = await this.prisma.item.findMany({
       where: other,
       skip: limit * (page - 1),
       take: limit,
       orderBy,
+    });
+    await this.prisma.item.count();
+    let itemsWithPhoto = [];
+    for (const item of items) {
+      itemsWithPhoto = [
+        ...itemsWithPhoto,
+        { ...item, photo: await this.uploadService.getItemPhoto(item.photo) },
+      ];
+    }
+    return new PageableDTO({
+      content: itemsWithPhoto,
+      limit: limit * (page - 1),
+      page,
+      totalElements: await this.prisma.item.count(),
     });
   }
 
