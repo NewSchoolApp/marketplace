@@ -240,7 +240,7 @@ export class OrderService {
     await this.educationPlatformIntegration.createNotification(updatedOrder);
   }
 
-  private async getUserUsedPoints(userId: string): Promise<number> {
+  public async getUserUsedPoints(userId: string): Promise<number> {
     const orders = await this.repository.getUserUsedPoints(userId);
     return orders.reduce(
       (acc, { quantity, points }) => acc + quantity * points,

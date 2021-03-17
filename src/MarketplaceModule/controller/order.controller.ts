@@ -5,6 +5,7 @@ import { Constants } from '../../CommonsModule/constants';
 import { OrderService } from '../service/order.service';
 import { InitOrderDTO } from '../dto/init-order.dto';
 import { CancelOrderDTO } from '../dto/cancel-order.dto';
+import { UserUsedPoints } from '../dto/user-used-points.dto';
 
 @ApiTags('Order')
 @Controller(
@@ -34,5 +35,12 @@ export class OrderController {
   @Get('/user/:userId')
   public getByUserId(@Param('userId') id: string): Promise<Order[]> {
     return this.service.getByUserId(id);
+  }
+
+  @Get('/user/:userId/used-points')
+  public async getUserUsedPoints(
+    @Param('userId') id: string,
+  ): Promise<UserUsedPoints> {
+    return { usedPoints: await this.service.getUserUsedPoints(id) };
   }
 }
