@@ -72,19 +72,22 @@ export class OrderService {
   }: InitOrderDTO) {
     const item = await this.itemRepository.findById(itemId);
     if (!item) {
-      await this.educationPlatformIntegration.createNotification({
-        itemId,
-        userId,
-        quantity,
-        points: null,
-        status: OrderStatusEnum.CANCELED,
-        content: {
-          cancelation: {
-            date: Date.now(),
-            reason: OrderCanceledEnum.DOES_NOT_EXISTS,
+      await this.educationPlatformIntegration.createNotification(
+        {
+          itemId,
+          userId,
+          quantity,
+          points: null,
+          status: OrderStatusEnum.CANCELED,
+          content: {
+            cancelation: {
+              date: Date.now(),
+              reason: OrderCanceledEnum.DOES_NOT_EXISTS,
+            },
           },
         },
-      });
+        { important: true },
+      );
       return;
     }
     const availableItem = await this.itemRepository.findAvailableById({
@@ -92,20 +95,23 @@ export class OrderService {
       minQuantity: quantity,
     });
     if (!availableItem) {
-      await this.educationPlatformIntegration.createNotification({
-        itemId,
-        userId,
-        quantity,
-        points: item.points,
-        status: OrderStatusEnum.CANCELED,
-        content: {
-          cancelation: {
-            date: Date.now(),
-            reason: OrderCanceledEnum.NOT_IN_STOCK,
+      await this.educationPlatformIntegration.createNotification(
+        {
+          itemId,
+          userId,
+          quantity,
+          points: item.points,
+          status: OrderStatusEnum.CANCELED,
+          content: {
+            cancelation: {
+              date: Date.now(),
+              reason: OrderCanceledEnum.NOT_IN_STOCK,
+            },
           },
+          item: availableItem,
         },
-        item: availableItem,
-      });
+        { important: true },
+      );
       return;
     }
     const [
@@ -120,20 +126,23 @@ export class OrderService {
     const avaliablePoints = Number(points) - userUsedPoints;
     const neededPointsForPurchase = quantity * availableItem.points;
     if (avaliablePoints < neededPointsForPurchase) {
-      await this.educationPlatformIntegration.createNotification({
-        itemId,
-        userId,
-        points: Number(points),
-        quantity,
-        content: {
-          cancelation: {
-            date: Date.now(),
-            reason: OrderCanceledEnum.NOT_ENOUGH_POINTS,
+      await this.educationPlatformIntegration.createNotification(
+        {
+          itemId,
+          userId,
+          points: Number(points),
+          quantity,
+          content: {
+            cancelation: {
+              date: Date.now(),
+              reason: OrderCanceledEnum.NOT_ENOUGH_POINTS,
+            },
           },
+          item: availableItem,
+          status: OrderStatusEnum.CANCELED,
         },
-        item: availableItem,
-        status: OrderStatusEnum.CANCELED,
-      });
+        { important: true },
+      );
       return;
     }
     const status = this.getInitialOrderStatus({
@@ -211,7 +220,9 @@ export class OrderService {
         data: { quantity: { increment: 1 } },
       }),
     ]);
-    await this.educationPlatformIntegration.createNotification(canceledOrder);
+    await this.educationPlatformIntegration.createNotification(canceledOrder, {
+      important: true,
+    });
   }
 
   public async sendEmailToCompany(

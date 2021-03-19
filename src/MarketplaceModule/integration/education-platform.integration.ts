@@ -55,6 +55,7 @@ export class EducationPlatformIntegration {
 
   public async createNotification(
     params: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> & { item?: Item },
+    options: { important: boolean } = { important: true },
   ): Promise<void> {
     const accessToken: string = await this.securityIntegration.getAccessToken();
     const body: CreateNotificationDTO = {
