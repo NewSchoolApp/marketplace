@@ -193,7 +193,7 @@ export class OrderService {
     reason: OrderCanceledEnum;
   }) {
     const order = await this.findById(id);
-    this.prisma.$transaction([
+    const [canceledOrder] = this.prisma.$transaction([
       this.prisma.order.update({
         where: { id },
         data: {
@@ -209,7 +209,7 @@ export class OrderService {
         data: { quantity: { increment: 1 } },
       }),
     ]);
-    await this.educationPlatformIntegration.createNotification(order);
+    await this.educationPlatformIntegration.createNotification(canceledOrder);
   }
 
   public async sendEmailToCompany(
