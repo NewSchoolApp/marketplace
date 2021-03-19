@@ -66,7 +66,7 @@ export class EducationPlatformIntegration {
       type: NotificationTypeEnum.MARKETPLACE,
     };
     if (params?.item?.photo) {
-      body.content.photo = this.config.getAwsS3MarketplaceBucketHttpsUrl(
+      body.content.item.photo = this.config.getAwsS3MarketplaceBucketHttpsUrl(
         params.item.photo,
       );
     }
