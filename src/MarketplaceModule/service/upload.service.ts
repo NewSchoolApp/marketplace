@@ -29,6 +29,7 @@ export class UploadService implements OnModuleInit {
       Bucket: this.configService.awsUserBucket,
       Key: filePath,
       Body: fileBuffer,
+      ACL: 'public-read',
     };
     return this.s3.putObject(params).promise();
   }
