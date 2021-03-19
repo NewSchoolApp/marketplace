@@ -57,6 +57,9 @@ export class AppConfigService {
   awsAccessKeySecret: string = this.configService.get<string>(
     'AWS_ACCESS_KEY_SECRET',
   );
+  awsS3MarketplaceBucketHttpsUrl: string = this.configService.get<string>(
+    'AWS_S3_MARKETPLACE_BUCKET_HTTPS_URL',
+  );
   awsBucketEndpoint: string = this.configService.get<string>(
     'AWS_BUCKET_ENDPOINT',
   );
@@ -118,5 +121,9 @@ export class AppConfigService {
   getClientCredentialsBase64() {
     const joinedUpClientCredentials = `${this.securityClientCredentialsName}:${this.securityClientCredentialsSecret}`;
     return Buffer.from(joinedUpClientCredentials).toString('base64');
+  }
+
+  getAwsS3MarketplaceBucketHttpsUrl(sufix: string) {
+    return `${this.awsS3MarketplaceBucketHttpsUrl}${sufix}`;
   }
 }
