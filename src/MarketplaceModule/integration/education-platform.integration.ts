@@ -54,11 +54,15 @@ export class EducationPlatformIntegration {
   }
 
   public async createNotification(
-    params: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> & { item?: Item },
+    params: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> & { item: Item },
   ): Promise<void> {
     const accessToken: string = await this.securityIntegration.getAccessToken();
     const body: CreateNotificationDTO = {
-      content: { ...params, ...(params.content as any) },
+      content: {
+        ...params,
+        ...(params.content as any),
+        photo: this.config.getAwsS3MarketplaceBucketHttpsUrl(params.item.photo),
+      },
       important: false,
       type: NotificationTypeEnum.MARKETPLACE,
     };

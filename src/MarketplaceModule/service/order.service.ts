@@ -104,6 +104,7 @@ export class OrderService {
             reason: OrderCanceledEnum.NOT_IN_STOCK,
           },
         },
+        item: availableItem,
       });
       return;
     }
@@ -130,6 +131,7 @@ export class OrderService {
             reason: OrderCanceledEnum.NOT_ENOUGH_POINTS,
           },
         },
+        item: availableItem,
         status: OrderStatusEnum.CANCELED,
       });
       return;
@@ -193,7 +195,7 @@ export class OrderService {
     reason: OrderCanceledEnum;
   }) {
     const order = await this.findById(id);
-    const [canceledOrder] = this.prisma.$transaction([
+    const [canceledOrder] = await this.prisma.$transaction([
       this.prisma.order.update({
         where: { id },
         data: {
