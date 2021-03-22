@@ -168,7 +168,11 @@ export class OrderService {
         },
       }),
     ]);
-    await this.educationPlatformIntegration.createNotification(order);
+    try {
+      await this.educationPlatformIntegration.createNotification(order);
+    } catch (e) {
+      console.error('Error when trying to create notification', e);
+    }
     if (availableItem.type === ItemTypeEnum.SERVICE) {
       await this.sqsService.send('sendEmailToCompany', {
         id: v4(),
@@ -250,7 +254,11 @@ export class OrderService {
       },
       include: { item: true },
     });
-    await this.educationPlatformIntegration.createNotification(updatedOrder);
+    try {
+      await this.educationPlatformIntegration.createNotification(updatedOrder);
+    } catch (e) {
+      console.error('Error when trying to create notification', e);
+    }
   }
 
   public async getUserUsedPoints(userId: string): Promise<number> {

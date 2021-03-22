@@ -84,7 +84,10 @@ export class ItemService {
     if (!item) {
       throw new NotFoundException(`Item with slug "${slug}" not found`);
     }
-    return {...item, photo: await this.uploadService.getItemPhoto(item.photo) }
+    return {
+      ...item,
+      photo: await this.uploadService.getItemPhoto(item.photo),
+    };
   }
 
   public async findAvailableById(
