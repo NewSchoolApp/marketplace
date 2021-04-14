@@ -12,8 +12,8 @@ import { QueryItemDTO } from '../dto/query-item.dto';
 import { CreateItemDTO } from '../dto/create-item.dto';
 import { ItemRepository } from '../repository/item.repository';
 import { PrismaService } from '../../PrismaModule/service/prisma.service';
-import { ErrorCodeEnum } from '../../CommonsModule/enum/error-code.enum';
 import { PageableDTO } from '../../CommonsModule/dto/pageable.dto';
+import { ErrorObject } from '../../CommonsModule/dto/error-object.dto';
 
 @Injectable()
 export class ItemService {
@@ -55,12 +55,14 @@ export class ItemService {
     const fileExtension = path.extname(file.originalname);
 
     if (!acceptedFileExtensions.includes(fileExtension)) {
-      throw new BadRequestException({
-        message: `Accepted file types are ${acceptedFileExtensions.join(
-          ',',
-        )}, you upload a ${fileExtension} file`,
-        errorCode: ErrorCodeEnum.WRONG_FILE_EXTENSION,
-      });
+      const customErrorMessage = `Accepted file types are ${acceptedFileExtensions.join(
+        ',',
+      )}, you upload a ${fileExtension} file`;
+      throw new BadRequestException(
+        new ErrorObject('WRONG_FILE_EXTENSION').customMessage(
+          customErrorMessage,
+        ),
+      );
     }
 
     const id = v4();
@@ -82,7 +84,11 @@ export class ItemService {
       where: { slug: { contains: slug } },
     });
     if (!item) {
-      throw new NotFoundException(`Item with slug "${slug}" not found`);
+      throw new NotFoundException(
+        new ErrorObject('WRONG_FILE_EXTENSION').customMessage(
+          `Item with slug "${slug}" not found`,
+        ),
+      );
     }
     return {
       ...item,
@@ -104,10 +110,11 @@ export class ItemService {
       minQuantity: minQuantity,
     });
     if (!availableItem) {
-      throw new BadRequestException({
-        message: `Item with id ${id} doesn't have the ordered quantity`,
-        errorCode: ErrorCodeEnum.NOT_IN_STOCK,
-      });
+      throw new BadRequestException(
+        new ErrorObject('NOT_IN_STOCK').customMessage(
+          `Item with id ${id} doesn't have the ordered quantity`,
+        ),
+      );
     }
     return availableItem;
   }
@@ -115,10 +122,11 @@ export class ItemService {
   public async findById(id: string) {
     const item = await this.repository.findById(id);
     if (!item) {
-      throw new BadRequestException({
-        message: `Item with id ${id} doesn't have the ordered quantity`,
-        errorCode: ErrorCodeEnum.NOT_IN_STOCK,
-      });
+      throw new BadRequestException(
+        new ErrorObject('NOT_IN_STOCK').customMessage(
+          `Item with id ${id} doesn't have the ordered quantity`,
+        ),
+      );
     }
     return item;
   }

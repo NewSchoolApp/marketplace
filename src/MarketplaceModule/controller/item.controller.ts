@@ -7,8 +7,9 @@ import {
   Post,
   Query,
   UploadedFile,
-  UseInterceptors
-} from "@nestjs/common";
+  UseInterceptors,
+  UseGuards,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { Item } from '@prisma/client';
@@ -17,7 +18,12 @@ import { QueryItemDTO } from '../dto/query-item.dto';
 import { Constants } from '../../CommonsModule/constants';
 import { CreateItemDTO } from '../dto/create-item.dto';
 import { IncrementDecrementBodyDTO } from '../dto/increment-decrement-body.dto';
-import { PageableDTO } from "../../CommonsModule/dto/pageable.dto";
+import { PageableDTO } from '../../CommonsModule/dto/pageable.dto';
+import { RoleGuard } from '../../CommonsModule/guard/role.guard';
+import {
+  NeedPolicies,
+  NeedRoles,
+} from '../../CommonsModule/decorator/role-guard-metadata.decorator';
 
 @ApiTags('Item')
 @Controller(
@@ -27,26 +33,35 @@ export class ItemController {
   constructor(private readonly service: ItemService) {}
 
   @Get()
+  @UseGuards(RoleGuard)
+  @NeedRoles('STUDENT', 'ADMIN')
+  @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ALL_ITEMS`)
   public getAll(@Query() query: QueryItemDTO): Promise<PageableDTO<Item>> {
     return this.service.getAll(query);
   }
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @NeedRoles('ADMIN')
+  @NeedPolicies(`${Constants.POLICIES_PREFIX}/CREATE_ITEM`)
   public create(
     @Body() item: CreateItemDTO,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Item> {
-    if (!file) throw new BadRequestException('file not found')
+    if (!file) throw new BadRequestException('file not found');
     return this.service.create({ ...item, file });
   }
 
   @Get('/slug/:slug')
+  @NeedRoles('STUDENT', 'ADMIN')
+  @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ITEM_BY_SLUG`)
   public findBySlug(@Param('slug') slug: string): Promise<Item> {
     return this.service.findBySlug(slug);
   }
 
   @Post('/:id/quantity/increment')
+  @NeedRoles('ADMIN')
+  @NeedPolicies(`${Constants.POLICIES_PREFIX}/INCREMENT_ITEM_QUANTITY`)
   public async incrementItemQuantity(
     @Param('id') id: string,
     @Body() { quantity }: IncrementDecrementBodyDTO,
@@ -55,6 +70,8 @@ export class ItemController {
   }
 
   @Post('/:id/quantity/decrement')
+  @NeedRoles('ADMIN')
+  @NeedPolicies(`${Constants.POLICIES_PREFIX}/DECREMENT_ITEM_QUANTITY`)
   public async decrementItemQuantity(
     @Param('id') id: string,
     @Body() { quantity }: IncrementDecrementBodyDTO,
