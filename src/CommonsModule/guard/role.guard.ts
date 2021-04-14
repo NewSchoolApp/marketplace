@@ -56,11 +56,11 @@ export class RoleGuard implements CanActivate {
       }
       throw new UnauthorizedException(e.data);
     }
-    const hasRoles = roles.length
+    const hasRoles = roles?.length
       ? roles.some((role) => role === user.role.name)
       : true;
 
-    const hasPolicies = policies.length
+    const hasPolicies = policies?.length
       ? policies.some((policy) =>
           user.role.policies.some((userPolicy) => userPolicy.name === policy),
         )
