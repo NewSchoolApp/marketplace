@@ -62,7 +62,7 @@ export class RoleGuard implements CanActivate {
 
     const hasPolicies = policies?.length
       ? policies.some((policy) =>
-          user.role?.policies.some((userPolicy) => userPolicy.name === policy),
+          user.role.policies.some((userPolicy) => userPolicy.name === policy),
         )
       : true;
 
