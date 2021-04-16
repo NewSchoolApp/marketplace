@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SqsService } from '@ssut/nestjs-sqs';
@@ -18,7 +20,7 @@ import { OrderRepository } from '../repository/order.repository';
 import { ContentDTO } from '../dto/init-order.dto';
 import { ItemTypeEnum } from '../enum/item-type.enum';
 import { AppConfigService as ConfigService } from '../../ConfigModule/service/app-config.service';
-import { ErrorCodeEnum } from '../../CommonsModule/enum/error-code.enum';
+import { ErrorObject } from '../../CommonsModule/dto/error-object.dto';
 
 @Injectable()
 export class OrderService {
@@ -51,10 +53,11 @@ export class OrderService {
     const avaliablePoints = Number(points) - userUsedPoints;
     const neededPointsForPurchase = createOrder.quantity * item.points;
     if (avaliablePoints < neededPointsForPurchase) {
-      throw new BadRequestException({
-        message: `You need ${neededPointsForPurchase} points to make this purchase, but you only have ${avaliablePoints} avaliable`,
-        errorCode: ErrorCodeEnum.NOT_ENOUGH_POINTS,
-      });
+      throw new BadRequestException(
+        new ErrorObject('NOT_ENOUGH_POINTS').customMessage(
+          `You need ${neededPointsForPurchase} points to make this purchase, but you only have ${avaliablePoints} avaliable`,
+        ),
+      );
     }
     await this.sqsService.send('createOrder', {
       id: v4(),
@@ -149,7 +152,7 @@ export class OrderService {
       itemType: ItemTypeEnum[availableItem.type],
       content,
     });
-    const [_, order] = await this.prisma.$transaction([
+    const [, order] = await this.prisma.$transaction([
       this.prisma.item.update({
         where: { id: itemId },
         data: { quantity: { decrement: 1 } },
@@ -184,10 +187,11 @@ export class OrderService {
   public async findById(id: string): Promise<Order> {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {
-      throw new NotFoundException({
-        message: `Order with id ${id} not found`,
-        errorCode: ErrorCodeEnum.NOT_IN_STOCK,
-      });
+      throw new NotFoundException(
+        new ErrorObject('NOT_IN_STOCK').customMessage(
+          `Order with id ${id} not found`,
+        ),
+      );
     }
     return order;
   }

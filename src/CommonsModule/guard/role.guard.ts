@@ -3,27 +3,28 @@ import {
   ExecutionContext,
   HttpService,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
+import axios, { AxiosError } from 'axios';
+import { UserJWTDTO } from '../dto/user-jwt.dto';
 import { AppConfigService as ConfigService } from '../../ConfigModule/service/app-config.service';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const roles: string[] = this.reflector.get<string[]>(
-      'roles',
-      context.getHandler(),
-    );
-    if (!roles) {
+    const roles: string[] =
+      this.reflector.get<string[]>('roles', context.getHandler()) || [];
+    const policies: string[] =
+      this.reflector.get<string[]>('policies', context.getHandler()) || [];
+    if ((!roles && !policies) || (!roles.length && !policies.length)) {
       return true;
     }
 
@@ -33,25 +34,37 @@ export class RoleGuard implements CanActivate {
 
     if (!authorizationHeader) return false;
 
-    let user;
+    let user: UserJWTDTO;
     try {
       const { data } = await this.httpService
-        .post(this.configService.securityOauthTokenDetailsUrl, null, {
-          headers: { authorization: authorizationHeader },
-        })
+        .post<UserJWTDTO>(
+          this.configService.securityOauthTokenDetailsUrl,
+          null,
+          {
+            headers: { authorization: authorizationHeader },
+          },
+        )
         .toPromise();
       user = data;
     } catch (e) {
-      throw new UnauthorizedException(e.data);
+      if (axios.isAxiosError(e)) {
+        const error: AxiosError = e;
+        if (error.response.status === 401) throw new UnauthorizedException();
+        throw new InternalServerErrorException();
+      }
+      throw new InternalServerErrorException();
     }
-    const hasPermission: boolean = roles.some(
-      (role) =>
-        role === user.role.name ||
-        role === user.role.slug ||
-        user.role?.policies?.some(
-          (policy) => policy.name === role || policy.slug === role,
-        ),
-    );
-    return user?.role && hasPermission;
+
+    const hasRoles = roles.length
+      ? roles.some((role) => role === user.role.name)
+      : true;
+
+    const hasPolicies = policies.length
+      ? policies.some((policy) =>
+          user.role.policies.some((userPolicy) => userPolicy.name === policy),
+        )
+      : true;
+
+    return hasRoles || hasPolicies;
   }
 }
