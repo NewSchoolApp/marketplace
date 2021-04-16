@@ -1,10 +1,38 @@
 import { Expose, Type } from 'class-transformer';
-import { IsNotEmpty } from 'class-validator';
-import { UserDTO } from '../../UserModule/dto/user.dto';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
-export class UserJWTDTO extends UserDTO {
+export class UserJWTDTO {
+  @IsNotEmpty()
+  @IsString()
   @Expose()
+  id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Expose()
+  name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Expose()
+  username: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  @Expose()
+  enabled: boolean;
+
+  @Expose()
+  @IsNotEmpty()
   role: RoleJWTDTO;
+
+  @IsString()
+  @Expose()
+  phone?: string;
+
+  @IsString()
+  @Expose()
+  email?: string;
 }
 
 export class RoleJWTDTO {
