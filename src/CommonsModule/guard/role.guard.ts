@@ -7,29 +7,23 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import axios, { AxiosError } from 'axios';
+import { UserJWTDTO } from '../dto/user-jwt.dto';
 import { AppConfigService as ConfigService } from '../../ConfigModule/service/app-config.service';
-import { UserDTO } from '../../MarketplaceModule/dto/user.dto';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const roles: string[] = this.reflector.get<string[]>(
-      'roles',
-      context.getHandler(),
-    );
-    const policies: string[] = this.reflector.get<string[]>(
-      'policies',
-      context.getHandler(),
-    );
+    const roles: string[] =
+      this.reflector.get<string[]>('roles', context.getHandler()) || [];
+    const policies: string[] =
+      this.reflector.get<string[]>('policies', context.getHandler()) || [];
     if ((!roles && !policies) || (!roles.length && !policies.length)) {
       return true;
     }
@@ -40,12 +34,16 @@ export class RoleGuard implements CanActivate {
 
     if (!authorizationHeader) return false;
 
-    let user: UserDTO;
+    let user: UserJWTDTO;
     try {
       const { data } = await this.httpService
-        .post<UserDTO>(this.configService.securityOauthTokenDetailsUrl, null, {
-          headers: { authorization: authorizationHeader },
-        })
+        .post<UserJWTDTO>(
+          this.configService.securityOauthTokenDetailsUrl,
+          null,
+          {
+            headers: { authorization: authorizationHeader },
+          },
+        )
         .toPromise();
       user = data;
     } catch (e) {
@@ -54,13 +52,14 @@ export class RoleGuard implements CanActivate {
         if (error.response.status === 401) throw new UnauthorizedException();
         throw new InternalServerErrorException();
       }
-      throw new UnauthorizedException(e.data);
+      throw new InternalServerErrorException();
     }
-    const hasRoles = roles?.length
+
+    const hasRoles = roles.length
       ? roles.some((role) => role === user.role.name)
       : true;
 
-    const hasPolicies = policies?.length
+    const hasPolicies = policies.length
       ? policies.some((policy) =>
           user.role.policies.some((userPolicy) => userPolicy.name === policy),
         )
