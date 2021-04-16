@@ -31,8 +31,8 @@ export class AppConfigService {
   );
 
   // url example: http://localhost:8080/api/v1/gamification/ranking/user/:userId
-  educationPlatformGetUserRankingUrl: string = this.configService.get<string>(
-    'EDUCATION_PLATFORM_GET_USER_RANKING_URL',
+  educationPlatformGetUserRankingTotalPointsUrl: string = this.configService.get<string>(
+    'EDUCATION_PLATFORM_GET_USER_RANKING_TOTAL_POINTS_URL',
   );
 
   // url example: http://localhost:8080/api/v1/user/:userId
@@ -111,11 +111,11 @@ export class AppConfigService {
   }
 
   getEducationPlatformGetUserRankingUrl(userId: string): string {
-    return this.educationPlatformGetUserRankingUrl.replace(':userId', userId);
+    return this.educationPlatformGetUserRankingTotalPointsUrl.replace(':userId', userId);
   }
 
   getEducationPlatformGetUserUrl(userId: string): string {
-    return this.educationPlatformGetUserRankingUrl.replace(':userId', userId);
+    return this.educationPlatformGetUserRankingTotalPointsUrl.replace(':userId', userId);
   }
 
   getClientCredentialsBase64() {

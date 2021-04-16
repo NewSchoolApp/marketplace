@@ -123,8 +123,8 @@ export class ItemService {
     const item = await this.repository.findById(id);
     if (!item) {
       throw new BadRequestException(
-        new ErrorObject('NOT_IN_STOCK').customMessage(
-          `Item with id ${id} doesn't have the ordered quantity`,
+        new ErrorObject('ITEM_NOT_FOUND').customMessage(
+          `Item with id ${id} doesn't exist`,
         ),
       );
     }

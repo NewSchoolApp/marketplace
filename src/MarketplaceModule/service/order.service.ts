@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SqsService } from '@ssut/nestjs-sqs';

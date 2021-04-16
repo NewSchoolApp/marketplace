@@ -29,9 +29,6 @@ export class EducationPlatformIntegration {
         this.config.getEducationPlatformGetUserRankingUrl(userId),
         {
           headers,
-          params: {
-            timeRange: TimeRangeEnum.YEAR,
-          },
         },
       )
       .toPromise();
