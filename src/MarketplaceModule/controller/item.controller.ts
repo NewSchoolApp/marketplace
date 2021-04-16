@@ -33,17 +33,18 @@ export class ItemController {
   constructor(private readonly service: ItemService) {}
 
   @Get()
-  @UseGuards(RoleGuard)
-  @NeedRoles('STUDENT', 'ADMIN')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ALL_ITEMS`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('STUDENT', 'ADMIN')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ALL_ITEMS`)
   public getAll(@Query() query: QueryItemDTO): Promise<PageableDTO<Item>> {
     return this.service.getAll(query);
   }
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  @NeedRoles('ADMIN')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/CREATE_ITEM`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('ADMIN')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/CREATE_ITEM`)
   public create(
     @Body() item: CreateItemDTO,
     @UploadedFile() file: Express.Multer.File,
@@ -53,15 +54,17 @@ export class ItemController {
   }
 
   @Get('/slug/:slug')
-  @NeedRoles('STUDENT', 'ADMIN')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ITEM_BY_SLUG`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('STUDENT', 'ADMIN')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ITEM_BY_SLUG`)
   public findBySlug(@Param('slug') slug: string): Promise<Item> {
     return this.service.findBySlug(slug);
   }
 
   @Post('/:id/quantity/increment')
-  @NeedRoles('ADMIN')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/INCREMENT_ITEM_QUANTITY`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('ADMIN')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/INCREMENT_ITEM_QUANTITY`)
   public async incrementItemQuantity(
     @Param('id') id: string,
     @Body() { quantity }: IncrementDecrementBodyDTO,
@@ -70,8 +73,9 @@ export class ItemController {
   }
 
   @Post('/:id/quantity/decrement')
-  @NeedRoles('ADMIN')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/DECREMENT_ITEM_QUANTITY`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('ADMIN')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/DECREMENT_ITEM_QUANTITY`)
   public async decrementItemQuantity(
     @Param('id') id: string,
     @Body() { quantity }: IncrementDecrementBodyDTO,

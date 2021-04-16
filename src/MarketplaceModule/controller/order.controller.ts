@@ -19,22 +19,25 @@ export class OrderController {
   constructor(private readonly service: OrderService) {}
 
   @Post()
-  @NeedRoles('STUDENT')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/INIT_CREATE_ORDER`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('STUDENT')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/INIT_CREATE_ORDER`)
   public initCreateOrder(@Body() createOrder: InitOrderDTO): Promise<void> {
     return this.service.initCreateOrder(createOrder);
   }
 
   @Get('/:id')
-  @NeedRoles('STUDENT', 'ADMIN')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ORDER_BY_ID`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('STUDENT', 'ADMIN')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ORDER_BY_ID`)
   public findById(@Param(':id') id: string): Promise<Order> {
     return this.service.findById(id);
   }
 
   @Post('/:id/cancel')
-  @NeedRoles('ADMIN')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/CANCEL_ORDER`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('ADMIN')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/CANCEL_ORDER`)
   public cancelOrder(
     @Param('id') id: string,
     @Body() { reason }: CancelOrderDTO,
@@ -43,15 +46,17 @@ export class OrderController {
   }
 
   @Get('/user/:userId')
-  @NeedRoles('ADMIN', 'STUDENT')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ORDER_BY_USER_ID`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('ADMIN', 'STUDENT')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_ORDER_BY_USER_ID`)
   public getByUserId(@Param('userId') id: string): Promise<Order[]> {
     return this.service.getByUserId(id);
   }
 
   @Get('/user/:userId/used-points')
-  @NeedRoles('ADMIN', 'STUDENT')
-  @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_USER_USED_POINTS`)
+  // @UseGuards(RoleGuard)
+  // @NeedRoles('ADMIN', 'STUDENT')
+  // @NeedPolicies(`${Constants.POLICIES_PREFIX}/GET_USER_USED_POINTS`)
   public async getUserUsedPoints(
     @Param('userId') id: string,
   ): Promise<UserUsedPoints> {
